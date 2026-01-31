@@ -19,7 +19,7 @@ app.post('/run-command', (req, res) => {
 
     if (error) {
       // Convert \n to real line breaks in error output
-      const errOutput = error.message.replace(/\\n/g, '\n');
+      const errOutput = error.message.replace(/\\n/g,);
       return res.json({ error: errOutput });
     }
 
