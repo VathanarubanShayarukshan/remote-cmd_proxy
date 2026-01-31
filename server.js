@@ -1,4 +1,3 @@
-
 const express = require('express');
 const { exec } = require('child_process');
 const path = require('path');
@@ -6,7 +5,7 @@ const path = require('path');
 const app = express();
 app.use(express.json());
 
-// Serve the HTML file
+// Serve static HTML files from "public" folder
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.post('/run-command', (req, res) => {
@@ -17,10 +16,19 @@ app.post('/run-command', (req, res) => {
   }
 
   exec(command, (error, stdout, stderr) => {
+
     if (error) {
-      return res.json({ error: error.message, stderr });
+      // Convert \n to real line breaks in error output
+      const errOutput = error.message.replace(/\\n/g, '\n');
+      return res.json({ error: errOutput });
     }
-    res.json({ output: stdout || stderr });
+
+    let output = stdout || stderr;
+
+    // ✅ MAIN FIX: Convert "\n" text into actual new line
+    output = output.replace(/\\n/g, '\n');
+
+    res.json({ output: output });
   });
 });
 
