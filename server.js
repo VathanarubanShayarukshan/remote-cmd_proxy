@@ -26,11 +26,11 @@ app.post('/run-command', async (req, res) => {
   // MODE SWITCH
   if (command === "1") {
     userModes[userIP] = 1;
-    return res.json({ status: "Mode changed to CMD" });
+    return res.json({ status: "Mode changed to vercel CMD" });
   }
   if (command === "2") {
     userModes[userIP] = 2;
-    return res.json({ status: "Mode changed to CHATBOT" });
+    return res.json({ status: "Mode changed to termux" });
   }
 
   const currentMode = userModes[userIP];
