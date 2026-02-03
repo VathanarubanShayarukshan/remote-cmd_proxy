@@ -5,7 +5,7 @@ const app = express();
 app.use(express.json());
 
 // AI API URL
-const AI_API_URL = "https://feeds-collectors-changelog-promises.trycloudflare.com/run-command";
+const AI_API_URL = "https://eng-quizzes-webpage-medal.trycloudflare.com/run-command";
 
 // USER MODE MEMORY (IP based)
 const userModes = {};
