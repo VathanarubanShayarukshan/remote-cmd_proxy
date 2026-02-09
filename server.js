@@ -7,7 +7,7 @@ app.use(express.json());
 // =====================
 // AI API URL
 // =====================
-const AI_API_URL = "https://experience-ringtones-bids-everywhere.trycloudflare.com/run-command"; // replace with your AI API URL
+const AI_API_URL = "https://cautious-dollop-x5xgqwjr697p36pqj-4041.app.github.dev/run-command"; // replace with your AI API URL
 
 // =====================
 // USER MODE MEMORY (IP based)
