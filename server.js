@@ -11,7 +11,7 @@ app.use(express.json());
 const AI_API_URL = "https://communicate-nutritional-authorities-static.trycloudflare.com/run-command";
 
 // MODE 3 → NEW AI API
-const AI_API_URL_MODE3 = "https://translate-spot-sent-series.trycloudflare.com/run-command";
+const AI_API_URL_MODE3 = "https://campaign-bedroom-indicates-dat.trycloudflare.com/run-command";
 
 // =====================
 // USER MODE MEMORY (IP based)
@@ -52,7 +52,7 @@ app.post('/run-command', async (req, res) => {
 
   if (command === "3") {
     userModes[userIP] = 3;
-    return res.json({ status: "Mode changed to Github Linux" });
+    return res.json({ status: "Mode changed to Google Cloud Shell Linux" });
   }
 
   const currentMode = userModes[userIP];
