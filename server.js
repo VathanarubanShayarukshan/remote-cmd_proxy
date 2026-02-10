@@ -5,15 +5,19 @@ const app = express();
 app.use(express.json());
 
 // =====================
-// AI API URL
+// AI API URLS
 // =====================
-const AI_API_URL = "https://communicate-nutritional-authorities-static.trycloudflare.com/run-command"; // replace with your AI API URL
+// MODE 2 → AI API
+const AI_API_URL = "https://communicate-nutritional-authorities-static.trycloudflare.com/run-command";
+
+// MODE 3 → NEW AI API
+const AI_API_URL_MODE3 = "https://translate-spot-sent-series.trycloudflare.com/run-command";
 
 // =====================
 // USER MODE MEMORY (IP based)
 // =====================
 const userModes = {};
-const DEFAULT_MODE = 2; // default = Chatbot
+const DEFAULT_MODE = 2; // default = Mode 2 (AI)
 
 // =====================
 // MAIN API
@@ -21,55 +25,85 @@ const DEFAULT_MODE = 2; // default = Chatbot
 app.post('/run-command', async (req, res) => {
   const userIP = req.ip;
 
-  // 🔹 use "command" key for both CMD & Chatbot
+  // 🔹 single key for all modes
   const command = (req.body.command || "").trim();
 
-  if (!command) return res.json({ error: "Empty command" });
+  if (!command) {
+    return res.json({ error: "Empty command" });
+  }
 
-  // first time user → set default mode
-  if (!userModes[userIP]) userModes[userIP] = DEFAULT_MODE;
+  // First-time user
+  if (!userModes[userIP]) {
+    userModes[userIP] = DEFAULT_MODE;
+  }
 
   // =====================
   // MODE SWITCH
   // =====================
   if (command === "1") {
     userModes[userIP] = 1;
-    return res.json({ status: "Mode changed to vercel CMD" });
+    return res.json({ status: "Mode changed to CMD mode" });
   }
+
   if (command === "2") {
     userModes[userIP] = 2;
     return res.json({ status: "Mode changed to termux" });
   }
 
+  if (command === "3") {
+    userModes[userIP] = 3;
+    return res.json({ status: "Mode changed to Github Linux" });
+  }
+
   const currentMode = userModes[userIP];
 
   // =====================
-  // MODE 1 → CMD
+  // MODE 1 → SERVER CMD
   // =====================
   if (currentMode === 1) {
     exec(command, (err, stdout, stderr) => {
-      if (err) return res.json({ output: err.message });
-      const output = stdout || stderr;
-      res.json({ output });
+      if (err) {
+        return res.json({ output: err.message });
+      }
+      res.json({ output: stdout || stderr });
     });
   }
 
   // =====================
-  // MODE 2 → CHATBOT
+  // MODE 2 → AI API #1
   // =====================
   else if (currentMode === 2) {
     try {
-      // Node 18+ fetch
       const aiRes = await fetch(AI_API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ command: command }) // use same 'command' key
+        body: JSON.stringify({ command })
       });
 
       const data = await aiRes.json();
       res.json({ reply: data.reply || data });
+
     } catch (err) {
-      res.json({ error: "AI Server Error" });
+      res.json({ error: "AI Server Error (Mode 2)" });
+    }
+  }
+
+  // =====================
+  // MODE 3 → AI API #2
+  // =====================
+  else if (currentMode === 3) {
+    try {
+      const aiRes = await fetch(AI_API_URL_MODE3, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ command })
+      });
+
+      const data = await aiRes.json();
+      res.json({ reply: data.reply || data });
+
+    } catch (err) {
+      res.json({ error: "AI Server Error (Mode 3)" });
     }
   }
 });
