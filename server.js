@@ -8,7 +8,7 @@ app.use(express.json());
 // AI API URLS
 // =====================
 // MODE 2 → AI API
-const AI_API_URL = "https://agreed-injured-percent-not.trycloudflare.com/run-command";
+const AI_API_URL = "https://widescreen-descriptions-travelers-metro.trycloudflare.com/run-command";
 
 // MODE 3 → NEW AI API
 const AI_API_URL_MODE3 = "https://campaign-bedroom-indicates-dat.trycloudflare.com/run-command";
