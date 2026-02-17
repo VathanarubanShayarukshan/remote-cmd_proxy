@@ -8,7 +8,7 @@ app.use(express.json());
 // AI API URLS
 // =====================
 // MODE 2 → AI API
-const AI_API_URL = "https://especially-popular-midlands-camps.trycloudflare.com/run-command";
+const AI_API_URL = "https://chrome-cancelled-animals-seeks.trycloudflare.com/run-command";
 
 // MODE 3 → NEW AI API
 const AI_API_URL_MODE3 = "https://especially-popular-midlands-camps.trycloudflare.com/run-command";
