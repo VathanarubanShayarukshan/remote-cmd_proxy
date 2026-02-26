@@ -1,355 +1,113 @@
 const express = require('express');
 const { exec } = require('child_process');
 
-// If Node version < 18, uncomment next line:
-// const fetch = require('node-fetch');
-
 const app = express();
 app.use(express.json());
 
 // =====================
 // AI API URLS
 // =====================
+// MODE 2 → AI API
 const AI_API_URL = "https://chrome-cancelled-animals-seeks.trycloudflare.com/run-command";
+
+// MODE 3 → NEW AI API
+const AI_API_URL_MODE3 = "https://especially-popular-midlands-camps.trycloudflare.com/run-command";
 const AI_API_URL_MODE3 = "https://contributor-geological-proved-donation.trycloudflare.com/run-command";
-const AI_API_URL_MODE4 = "https://your-new-api-url.trycloudflare.com/run-command";
 
 // =====================
-// USER MODE MEMORY
+// USER MODE MEMORY (IP based)
 // =====================
 const userModes = {};
-const DEFAULT_MODE = 2;
+const DEFAULT_MODE = 2; // default = Mode 2 (AI)
 
 // =====================
 // MAIN API
 // =====================
 app.post('/run-command', async (req, res) => {
+const userIP = req.ip;
 
-  const userIP = req.ip;
-  const command = (req.body.command || "").trim();
+// 🔹 single key for all modes
+const command = (req.body.command || "").trim();
 
-  if (!command) {
-    return res.json({ error: "Empty command" });
-  }
+if (!command) {
+return res.json({ error: "Empty command" });
+}
 
-  // First time user
-  if (!userModes[userIP]) {
-    userModes[userIP] = DEFAULT_MODE;
-  }
-
-  // =====================
-  // MODE SWITCH
-  // =====================
-  if (["1","2","3","4"].includes(command)) {
-    userModes[userIP] = Number(command);
-    return res.json({ status: `Mode changed to ${command}` });
-  }
-
-  const currentMode = userModes[userIP];
-
-  // =====================
-  // MODE 1 → SERVER CMD
-  // =====================
-  if (currentMode === 1) {
-
-    // ⚠ Optional security restriction
-    // if (!command.startsWith("ls") && !command.startsWith("pwd")) {
-    //   return res.json({ error: "Command not allowed" });
-    // }
-
-    exec(command, (err, stdout, stderr) => {
-      if (err) {
-        return res.json({ output: err.message });
-      }
-      return res.json({ output: stdout || stderr });
-    });
-
-  }
-
-  // =====================
-  // MODE 2 → AI API #1
-  // =====================
-  else if (currentMode === 2) {
-    try {
-
-      const aiRes = await fetch(AI_API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ command })
-      });
-
-      const data = await aiRes.json();
-      return res.json({ reply: data.reply || data });
-
-    } catch (err) {
-      return res.json({ error: "AI Server Error (Mode 2)" });
-    }
-  }
-
-  // =====================
-  // MODE 3 → AI API #2
-  // =====================
-  else if (currentMode === 3) {
-    try {
-
-      const aiRes = await fetch(AI_API_URL_MODE3, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ command })
-      });
-
-      const data = await aiRes.json();
-      return res.json({ reply: data.reply || data });
-
-    } catch (err) {
-      return res.json({ error: "AI Server Error (Mode 3)" });
-    }
-  }
-
-  // =====================
-  // MODE 4 → AI API #3
-  // =====================
-  else if (currentMode === 4) {
-    try {
-
-      const aiRes = await fetch(AI_API_URL_MODE4, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ command })
-      });
-
-      const data = await aiRes.json();
-      return res.json({ reply: data.reply || data });
-
-    } catch (err) {
-      return res.json({ error: "AI Server Error (Mode 4)" });
-    }
-  }
-
-  else {
-    return res.json({ error: "Invalid mode" });
-  }
-
-});
+// First-time user
+if (!userModes[userIP]) {
+userModes[userIP] = DEFAULT_MODE;
+}
 
 // =====================
-// SERVER START
+// MODE SWITCH
 // =====================
-const PORT = process.env.PORT || 4041;
+if (command === "1") {
+userModes[userIP] = 1;
+return res.json({ status: "Mode changed to CMD mode" });
+}
 
-app.listen(PORT, () => {
-  console.log("Server running on port " + PORT);
-});  if (["1","2","3","4"].includes(command)) {
-    userModes[userIP] = Number(command);
-    return res.json({ status: `Mode changed to ${command}` });
-  }
+if (command === "2") {
+userModes[userIP] = 2;
+return res.json({ status: "Mode changed to termux" });
+}
 
-  const currentMode = userModes[userIP];
-
-  // MODE 1 → SERVER CMD
-  if (currentMode === 1) {
-    exec(command, (err, stdout, stderr) => {
-      if (err) {
-        return res.json({ output: err.message });
-      }
-      res.json({ output: stdout || stderr });
-    });
-  }
-
-  // MODE 2
-  else if (currentMode === 2) {
-    try {
-      const aiRes = await fetch(AI_API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ command })
-      });
-
-      const data = await aiRes.json();
-      res.json({ reply: data.reply || data });
-
-    } catch {
-      res.json({ error: "AI Server Error (Mode 2)" });
-    }
-  }
-
-  // MODE 3
-  else if (currentMode === 3) {
-    try {
-      const aiRes = await fetch(AI_API_URL_MODE3, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ command })
-      });
-
-      const data = await aiRes.json();
-      res.json({ reply: data.reply || data });
-
-    } catch {
-      res.json({ error: "AI Server Error (Mode 3)" });
-    }
-  }
-
-  // MODE 4
-  else if (currentMode === 4) {
-    try {
-      const aiRes = await fetch(AI_API_URL_MODE4, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ command })
-      });
-
-      const data = await aiRes.json();
-      res.json({ reply: data.reply || data });
-
-    } catch {
-      res.json({ error: "AI Server Error (Mode 4)" });
-    }
-  }
-
-});
-
-// =====================
-// SERVER START
-// =====================
-const PORT = process.env.PORT || 4041;
-
-app.listen(PORT, () => {
-  console.log("Server running on port " + PORT);
-});      const aiRes = await fetch(AI_API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ command })
-      });
-
-      const data = await aiRes.json();
-      res.json({ reply: data.reply || data });
-
-    } catch (err) {
-      res.json({ error: "AI Server Error (Mode 2)" });
-    }
-  }
-
-  // =====================
-  // MODE 3 → AI API #2
-  // =====================
-  else if (currentMode === 3) {
-    try {
-      const aiRes = await fetch(AI_API_URL_MODE3, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ command })
-      });
-
-      const data = await aiRes.json();
-      res.json({ reply: data.reply || data });
-
-    } catch (err) {
-      res.json({ error: "AI Server Error (Mode 3)" });
-    }
-  }
-
-  // =====================
-  // MODE 4 → AI API #3
-  // =====================
-  else if (currentMode === 4) {
-    try {
-      const aiRes = await fetch(AI_API_URL_MODE4, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ command })
-      });
-
-      const data = await aiRes.json();
-      res.json({ reply: data.reply || data });
-
-    } catch (err) {
-      res.json({ error: "AI Server Error (Mode 4)" });
-    }
-  }
-
-});
-
-
-// =====================
-// SERVER START
-// =====================
-const PORT = process.env.PORT || 4041;
-
-app.listen(PORT, () => {
-  console.log("Server running on port " + PORT);
-});    userModes[userIP] = DEFAULT_MODE;
-  }
-
-  // =====================
-  // MODE SWITCH
-  // =====================
-  if (command === "1") {
-    userModes[userIP] = 1;
-    return res.json({ status: "Mode changed to CMD mode" });
-  }
-
-  if (command === "2") {
-    userModes[userIP] = 2;
-    return res.json({ status: "Mode changed to termux" });
-  }
-
-  if (command === "3") {
-    userModes[userIP] = 3;
+if (command === "3") {
+userModes[userIP] = 3;
+    return res.json({ status: "Mode changed to Google Cloud Shell Linux" });
     return res.json({ status: "Mode changed to Samsung mobile" });
-  }
+}
 
-  const currentMode = userModes[userIP];
+const currentMode = userModes[userIP];
 
-  // =====================
-  // MODE 1 → SERVER CMD
-  // =====================
-  if (currentMode === 1) {
-    exec(command, (err, stdout, stderr) => {
-      if (err) {
-        return res.json({ output: err.message });
-      }
-      res.json({ output: stdout || stderr });
-    });
-  }
+// =====================
+// MODE 1 → SERVER CMD
+// =====================
+if (currentMode === 1) {
+exec(command, (err, stdout, stderr) => {
+if (err) {
+return res.json({ output: err.message });
+}
+res.json({ output: stdout || stderr });
+});
+}
 
-  // =====================
-  // MODE 2 → AI API #1
-  // =====================
-  else if (currentMode === 2) {
-    try {
-      const aiRes = await fetch(AI_API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ command })
-      });
+// =====================
+// MODE 2 → AI API #1
+// =====================
+else if (currentMode === 2) {
+try {
+const aiRes = await fetch(AI_API_URL, {
+method: "POST",
+headers: { "Content-Type": "application/json" },
+body: JSON.stringify({ command })
+});
 
-      const data = await aiRes.json();
-      res.json({ reply: data.reply || data });
+const data = await aiRes.json();
+res.json({ reply: data.reply || data });
 
-    } catch (err) {
-      res.json({ error: "AI Server Error (Mode 2)" });
-    }
-  }
+} catch (err) {
+res.json({ error: "AI Server Error (Mode 2)" });
+}
+}
 
-  // =====================
-  // MODE 3 → AI API #2
-  // =====================
-  else if (currentMode === 3) {
-    try {
-      const aiRes = await fetch(AI_API_URL_MODE3, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ command })
-      });
+// =====================
+// MODE 3 → AI API #2
+// =====================
+else if (currentMode === 3) {
+try {
+const aiRes = await fetch(AI_API_URL_MODE3, {
+method: "POST",
+headers: { "Content-Type": "application/json" },
+body: JSON.stringify({ command })
+});
 
-      const data = await aiRes.json();
-      res.json({ reply: data.reply || data });
+const data = await aiRes.json();
+res.json({ reply: data.reply || data });
 
-    } catch (err) {
-      res.json({ error: "AI Server Error (Mode 3)" });
-    }
-  }
+} catch (err) {
+res.json({ error: "AI Server Error (Mode 3)" });
+}
+}
 });
 
 // =====================
@@ -357,5 +115,5 @@ app.listen(PORT, () => {
 // =====================
 const PORT = process.env.PORT || 4041;
 app.listen(PORT, () => {
-  console.log("Server running on port " + PORT);
+console.log("Server running on port " + PORT);
 });
